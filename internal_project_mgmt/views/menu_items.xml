@@ -1,0 +1,11 @@
+<odoo>
+    <data>
+      <menuitem 
+        id="menu_internal_project_mgmt"
+        action="action_internal_project_mgmt"
+        name="Internal Projects"
+        parent="project.menu_main_pm"
+        sequence="1"
+      />
+    </data>
+</odoo>

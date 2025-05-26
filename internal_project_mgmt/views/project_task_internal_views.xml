@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <record id="project_task_internal_form_view" model="ir.ui.view">
+            <field name="name">project.task.internal.form</field>
+            <field name="model">project.task.internal</field>
+            <field name="arch" type="xml">
+                <form string="Internal Task">
+                    <header>
+                        <button name="action_start" string="Start" type="object" class="btn-primary" invisible="state != 'open'"/>
+                        <button name="action_review" string="Review" type="object" class="btn-warning" invisible="state != 'working'"/>
+                        <button name="action_done" string="Done" type="object" class="btn-success" invisible="state != 'review'"/>
+                        <button name="action_cancel" string="Cancel" type="object" class="btn-danger" invisible="state in ['working', 'review', 'done', 'cancelled']"/>
+                        <button name="action_reopen" string="Reopen" type="object" class="btn-secondary" invisible="state in ['open', 'review','working']"/>
+                        <field name="state" widget="statusbar" options="{'clickable':True, 'fold_field':'fold'}" />
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Task Name"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="project_id"/>
+                                <field name="assigned_to"/>
+                                <field name="due_date"/>
+                            </group>
+                            <group>
+                                <field name="priority" widget="priority"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Description">
+                                <field name="description"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="project_task_internal_tree_view" model="ir.ui.view">
+            <field name="name">project.task.internal.tree</field>
+            <field name="model">project.task.internal</field>
+            <field name="arch" type="xml">
+                <tree string="Internal Tasks">
+                    <field name="name"/>
+                    <field name="project_id"/>
+                    <field name="assigned_to"/>
+                    <field name="due_date"/>
+                    <field name="priority" widget="priority"/>
+                    <field name="state" decoration-success="state == 'done'" decoration-warning="state == 'working'" decoration-danger="state == 'cancelled'" widget="badge"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="project_task_internal_kanban_view" model="ir.ui.view">
+            <field name="name">project.task.internal.kanban</field>
+            <field name="model">project.task.internal</field>
+            <field name="arch" type="xml">
+                <kanban default_group_by="state" class="oe_kanban_small_column">
+                    <field name="name"/>
+                    <field name="project_id"/>
+                    <field name="assigned_to"/>
+                    <field name="due_date"/>
+                    <field name="priority"/>
+                    <field name="state"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_card oe_kanban_global_click">
+                                <div class="o_kanban_content">
+                                    <div class="o_kanban_record_title">
+                                        <strong><field name="name"/></strong>
+                                    </div>
+                                    <div class="o_kanban_record_body">
+                                        <field name="project_id"/>
+                                        <br/>
+                                        <field name="assigned_to"/>
+                                    </div>
+                                    <div class="o_kanban_record_bottom">
+                                        <div class="oe_kanban_bottom_left">
+                                            <field name="priority" widget="priority"/>
+                                        </div>
+                                        <div class="oe_kanban_bottom_right">
+                                            <field name="due_date"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record id="project_task_internal_gantt_view" model="ir.ui.view">
+            <field name="name">project.task.internal.gantt</field>
+            <field name="model">project.task.internal</field>
+            <field name="arch" type="xml">
+                <gantt string="Tasks Gantt" 
+                       date_start="due_date" 
+                       date_stop="due_date"
+                       default_group_by="project_id"
+                       color="assigned_to">
+                    <field name="name"/>
+                    <field name="project_id"/>
+                    <field name="assigned_to"/>
+                    <field name="state"/>
+                </gantt>
+            </field>
+        </record>
+
+        <record id="project_task_internal_search_view" model="ir.ui.view">
+            <field name="name">project.task.internal.search</field>
+            <field name="model">project.task.internal</field>
+            <field name="arch" type="xml">
+                <search string="Seach Internal Task">
+                    <field name="name"/>
+                    <field name="project_id"/>
+                    <field name="assigned_to"/>
+                    <separator/>
+                    <filter string="My Tasks" name="my_tasks" 
+                            domain="[('assigned_to.user_id', '=', uid)]"/>
+                    <filter string="Open" name="open" domain="[('state', '=', 'open')]"/>
+                    <filter string="Working" name="working" domain="[('state', '=', 'working')]"/>
+                    <filter string="Review" name="review" domain="[('state', '=', 'review')]"/>
+                    <filter string="Done" name="done" domain="[('state', '=', 'done')]"/>
+                    <filter string="High Priority" name="high_priority" domain="[('priority', '=', 'high')]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Project" name="group_project" domain="[]" context="{'group_by': 'project_id'}"/>
+                        <filter string="Assigned To" name="group_assigned" domain="[]" context="{'group_by': 'assigned_to'}"/>
+                        <filter string="State" name="group_state" domain="[]" context="{'group_by': 'state'}"/>
+                        <filter string="Priority" name="group_priority" domain="[]" context="{'group_by': 'priority'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_internal_project_task_mgmt" model="ir.actions.act_window">
+            <field name="name">Internal Tasks</field>
+            <field name="res_model">project.task.internal</field>
+            <field name="view_mode">gantt,kanban,tree,form</field>
+        </record>
+
+    </data>
+</odoo>
