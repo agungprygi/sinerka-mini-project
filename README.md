@@ -1,0 +1,1 @@
+# sinerka-mini-project
